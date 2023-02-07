@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NestJsModules.NET", "NestJsModules.NET\NestJsModules.NET.csproj", "{095D0CDD-59B0-4F59-9EBC-CA81ACAF87BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{9AA2C19B-1213-4B61-93DE-9357D075CFC4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{095D0CDD-59B0-4F59-9EBC-CA81ACAF87BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{095D0CDD-59B0-4F59-9EBC-CA81ACAF87BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{095D0CDD-59B0-4F59-9EBC-CA81ACAF87BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{095D0CDD-59B0-4F59-9EBC-CA81ACAF87BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AA2C19B-1213-4B61-93DE-9357D075CFC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AA2C19B-1213-4B61-93DE-9357D075CFC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AA2C19B-1213-4B61-93DE-9357D075CFC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AA2C19B-1213-4B61-93DE-9357D075CFC4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A316B3C1-9D47-4D56-9A23-6D40BEB17BD8}
+	EndGlobalSection
+EndGlobal
