@@ -49,6 +49,34 @@ namespace Tests
 		}
 
 
+		[TestMethod]
+		public void ShouldGetDependencyFromSubmoduleExports()
+		{
+			var submodule = new Module();
+			submodule.AddForExport<ISpeaker>(new Speaker());
+
+			var rootmodule = new Module();
+			rootmodule.Import(submodule);
+
+			var speaker = rootmodule.Get<ISpeaker>();
+			Assert.IsNotNull(speaker);
+			Assert.AreEqual(HI_STRING, speaker.SayHi());
+		}
+
+
+		[TestMethod]
+		public void ShouldNotGetDependencyFromSubmoduleWhenItIsNotForExport()
+		{
+			var submodule = new Module();
+			submodule.Add<ISpeaker>(new Speaker());
+
+			var rootmodule = new Module();
+			rootmodule.Import(submodule);
+
+			Assert.ThrowsException<KeyNotFoundException>(rootmodule.Get<ISpeaker>);
+		}
+
+
 		private interface ISpeaker
 		{
 			string SayHi();
