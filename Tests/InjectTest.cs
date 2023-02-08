@@ -80,19 +80,19 @@ namespace Tests
 			module.BindValue<string>(MESSAGE);
 
 			var rootInstance = module.Get<Root>();
-			Assert.AreEqual(MESSAGE, rootInstance.Child.Message);
+			Assert.AreEqual(MESSAGE, rootInstance!.Child!.Message);
 		}
 
 
 		#region Recursive Injection Test
 		class Root
 		{
-			[Inject] public Child Child;
+			[Inject] public Child? Child;
 		}
 
 		class Child
 		{
-			[Inject] public string Message;
+			[Inject] public string? Message;
 		}
 		#endregion
 	}

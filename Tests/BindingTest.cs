@@ -85,15 +85,15 @@ namespace Tests
 		{
 			Module module1 = new Module();
 			module1.InstantiateValue<Speaker>();
-			var speaker11 = module1!.Get<Speaker>();
-			var speaker12 = module1!.Get<Speaker>();
-			Assert.AreEqual<Speaker>(speaker11, speaker12);
+			Speaker? speaker11 = module1!.Get<Speaker>();
+			Speaker? speaker12 = module1!.Get<Speaker>();
+			Assert.AreEqual<Speaker>(speaker11!, speaker12!);
 
 			Module module2 = new Module();
 			module2.InstantiateValueForExport<Speaker>();
-			var speaker21 = module2!.Get<Speaker>();
-			var speaker22 = module2!.Get<Speaker>();
-			Assert.AreEqual<Speaker>(speaker21, speaker22);
+			Speaker? speaker21 = module2!.Get<Speaker>();
+			Speaker? speaker22 = module2!.Get<Speaker>();
+			Assert.AreEqual<Speaker>(speaker21!, speaker22!);
 
 			Assert.AreNotEqual(speaker11, speaker21);
 		}
@@ -116,7 +116,7 @@ namespace Tests
 		{
 			Module module = new Module();
 			module.InstantiateValue<ISpeaker, StructSpeaker>();
-			ISpeaker speaker = module.Get<ISpeaker>();
+			ISpeaker? speaker = module.Get<ISpeaker>();
 			Assert.IsInstanceOfType(speaker, typeof(StructSpeaker));
 			Assert.AreEqual(HI_STRING, speaker!.SayHi());
 		}

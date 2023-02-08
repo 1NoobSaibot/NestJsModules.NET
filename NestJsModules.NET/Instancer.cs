@@ -10,16 +10,16 @@ namespace NestJsModules
 		public Instancer(Type type, IGetModule module)
 		{
 			_module = module;
-			_CreateInstance(type);
+			Value = _CreateInstance(type);
 		}
 
 
-		private void _CreateInstance(Type type)
+		private object _CreateInstance(Type type)
 		{
 			object instance = _FindConstructorAndConstruct(type);
 			_InjectProps(type, instance);
 			_InjectFields(type, instance);
-			Value = instance;
+			return instance;
 		}
 
 
