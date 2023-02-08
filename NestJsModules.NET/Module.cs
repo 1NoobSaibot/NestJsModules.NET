@@ -1,4 +1,6 @@
-﻿namespace NestJsModules
+﻿using System.Reflection;
+
+namespace NestJsModules
 {
 	public class Module
 	{
@@ -26,6 +28,18 @@
 		}
 
 
+		public void Add<TBase, TDerived>() where TDerived : class, TBase
+		{
+			Add(typeof(TBase).ToString(), typeof(TDerived));
+		}
+
+
+		public void Add<T>() where T : class
+		{
+			Add<T, T>();
+		}
+
+
 		public void AddForExport(string key, object? value)
 		{
 			_exports[key] = value;
@@ -42,15 +56,37 @@
 		{
 			AddForExport(typeof(T).ToString(), obj);
 		}
+
+
+		public void AddForExport<TBase, TDerived>() where TDerived : class, TBase
+		{
+			AddForExport(typeof(TBase).ToString(), typeof(TDerived));
+		}
+
+
+		public void AddForExport<T>() where T : class
+		{
+			Add<T, T>();
+		}
 		#endregion
 
 
 		#region GetMethods
 		public object? Get(string key)
 		{
-			return _singletoneScope.GetValueOrDefault(key)
-				?? _exports.GetValueOrDefault(key)
-				?? _FindFirstInChildrenExports(key);
+			if (_singletoneScope.ContainsKey(key))
+			{
+				var value = _singletoneScope[key];
+				return _CheckValue(key, value, _singletoneScope);
+			}
+
+			if (_exports.ContainsKey(key))
+			{
+				var value = _singletoneScope[key];
+				return _CheckValue(key, value, _exports);
+			}
+
+			return _FindFirstInChildrenExports(key);
 		}
 
 
@@ -102,6 +138,132 @@
 			}
 
 			throw new KeyNotFoundException($"Dependency {key} was not provided");
+		}
+
+
+		private object? _CheckValue(string key, object? value, Dictionary<string, object?> dict)
+		{
+			if (value is Type type)
+			{
+				object instance = _CreateInstance(type);
+				dict[key] = instance;
+				return instance;
+			}
+
+			return value;
+		}
+
+
+		private object _CreateInstance(Type type)
+		{
+			object instance = _FindConstructorAndConstruct(type);
+			_InjectProps(type, instance);
+			_InjectFields(type, instance);
+			return instance;
+		}
+
+
+		private void _InjectProps(Type type, object instance)
+		{
+			foreach (PropertyInfo prop in type.GetRuntimeProperties())
+			{
+				var attrs = prop.GetCustomAttributes();
+				Inject? data = attrs.FirstOrDefault((attr) => attr is Inject) as Inject;
+				
+				if (data != null)
+				{
+					string key = data.Key ?? prop.GetType().ToString();
+					object? value = Get(key);
+					prop.SetValue(instance, value);
+				}
+			}
+		}
+
+
+		private void _InjectFields(Type type, object instance)
+		{
+			foreach (FieldInfo field in type.GetRuntimeFields())
+			{
+				var attrs = field.GetCustomAttributes();
+				Inject? data = attrs.FirstOrDefault((attr) => attr is Inject) as Inject;
+
+				if (data != null)
+				{
+					string key = data.Key ?? field.GetType().ToString();
+					object? value = Get(key);
+					field.SetValue(instance, value);
+					continue;
+				}
+			}
+		}
+
+
+		private object _FindConstructorAndConstruct(Type type)
+		{
+			foreach (var ctor in type.GetConstructors())
+			{
+				if (_IsInjectConstructor(ctor))
+				{
+					return _Construct(ctor);
+				}
+			}
+
+			foreach (var ctor in type.GetConstructors())
+			{
+				if (ctor.GetParameters().Length == 0)
+				{
+					return _Construct(ctor);
+				}
+			}
+
+			throw new Exception($"The class {type} has no injectable constructor or constructor without parameters");
+		}
+
+
+		private bool _IsInjectConstructor(ConstructorInfo ctor)
+		{
+			foreach (var attribute in ctor.GetCustomAttributes())
+			{
+				if (attribute is InjectConstructor)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+
+		private object _Construct(ConstructorInfo ctor)
+		{
+			if (ctor.GetParameters().Length == 0)
+			{
+				return ctor.Invoke(null);
+			}
+
+			var parameters = ctor.GetParameters();
+			object?[] args = new object[parameters.Length];
+			for (int i = 0; i < args.Length; i++)
+			{
+				args[i] = _ProvideValue(parameters[i]);
+			}
+
+			return ctor.Invoke(args);
+		}
+
+
+		private object? _ProvideValue(ParameterInfo param)
+		{
+			foreach (var attr in param.GetCustomAttributes())
+			{
+				if (attr is Inject injectData)
+				{
+					string key = injectData.Key ?? param.GetType().ToString();
+					return Get(key);
+				}
+			}
+
+			return Get(param.GetType().ToString());
 		}
 	}
 }
