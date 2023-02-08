@@ -28,13 +28,19 @@ namespace NestJsModules
 		}
 
 
-		public void Add<TBase, TDerived>() where TDerived : class, TBase
+		public void Add<TBase, TDerived>() where TDerived : TBase
 		{
+			Type type = typeof(TDerived);
+			if (type.IsInterface || type.IsAbstract)
+			{
+				throw new ArgumentException($"Cannot instantiate interface or abstract type {type.Name}");
+			}
+
 			Add(typeof(TBase).ToString(), typeof(TDerived));
 		}
 
 
-		public void Add<T>() where T : class
+		public void Add<T>()
 		{
 			Add<T, T>();
 		}
@@ -58,15 +64,20 @@ namespace NestJsModules
 		}
 
 
-		public void AddForExport<TBase, TDerived>() where TDerived : class, TBase
+		public void AddForExport<TBase, TDerived>() where TDerived : TBase
 		{
-			AddForExport(typeof(TBase).ToString(), typeof(TDerived));
+			Type type = typeof(TDerived);
+			if (type.IsInterface || type.IsAbstract)
+			{
+				throw new ArgumentException($"Cannot instantiate interface or abstract type {type.Name}");
+			}
+			AddForExport(typeof(TBase).ToString(), type);
 		}
 
 
-		public void AddForExport<T>() where T : class
+		public void AddForExport<T>()
 		{
-			Add<T, T>();
+			AddForExport<T, T>();
 		}
 		#endregion
 
@@ -82,7 +93,7 @@ namespace NestJsModules
 
 			if (_exports.ContainsKey(key))
 			{
-				var value = _singletoneScope[key];
+				var value = _exports[key];
 				return _CheckValue(key, value, _exports);
 			}
 
@@ -119,7 +130,8 @@ namespace NestJsModules
 
 		private object? _GetExport(string key)
 		{
-			return _exports[key];
+			var value = _exports[key];
+			return _CheckValue(key, value, _exports);
 		}
 
 
@@ -172,7 +184,7 @@ namespace NestJsModules
 				
 				if (data != null)
 				{
-					string key = data.Key ?? prop.GetType().ToString();
+					string key = data.Key ?? prop.PropertyType.ToString();
 					object? value = Get(key);
 					prop.SetValue(instance, value);
 				}
@@ -189,7 +201,7 @@ namespace NestJsModules
 
 				if (data != null)
 				{
-					string key = data.Key ?? field.GetType().ToString();
+					string key = data.Key ?? field.FieldType.ToString();
 					object? value = Get(key);
 					field.SetValue(instance, value);
 					continue;

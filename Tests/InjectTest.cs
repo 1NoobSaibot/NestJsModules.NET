@@ -21,6 +21,7 @@ namespace Tests
 		}
 
 
+		#region Base Injection Test
 		private interface ISpeaker
 		{
 			string? SayHi();
@@ -64,6 +65,35 @@ namespace Tests
 		private const string PRIVATE_PROP_VALUE = "getOnlyPropVALUE";
 		private const string CONSTRUCT_ARG_KEY = "constructKey";
 		private const string CONSTRUCT_ARG_VALUE = "constructValue";
+		#endregion
 
+
+
+		[TestMethod]
+		public void ShouldInjectRecursively()
+		{
+			const string MESSAGE = "Rock the microphone!!!";
+
+			var module = new Module();
+			module.Add<Root>();
+			module.Add<Child>();
+			module.Add<string>(MESSAGE);
+
+			var rootInstance = module.Get<Root>();
+			Assert.AreEqual(MESSAGE, rootInstance.Child.Message);
+		}
+
+
+		#region Recursive Injection Test
+		class Root
+		{
+			[Inject] public Child Child;
+		}
+
+		class Child
+		{
+			[Inject] public string Message;
+		}
+		#endregion
 	}
 }
