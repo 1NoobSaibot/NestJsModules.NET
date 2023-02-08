@@ -14,7 +14,7 @@ namespace Tests
 			Module module = new Module();
 			Assert.ThrowsException<KeyNotFoundException>(() => module.Get(key));
 
-			module.Add(key, value);
+			module.BindValue(key, value);
 			Assert.AreEqual(value, module.Get<string>(key));
 		}
 
@@ -27,7 +27,7 @@ namespace Tests
 			Module module = new Module();
 			Assert.ThrowsException<KeyNotFoundException>(module.Get<string>);
 
-			module.Add(value);
+			module.BindValue(value);
 			Assert.AreEqual(value, module.Get<string>());
 		}
 
@@ -38,7 +38,7 @@ namespace Tests
 			Module module = new Module();
 			Assert.ThrowsException<KeyNotFoundException>(module.Get<ISpeaker>);
 
-			module.Add<ISpeaker>(new Speaker());
+			module.BindValue<ISpeaker>(new Speaker());
 			Assert.IsInstanceOfType(module.Get<ISpeaker>(), typeof(ISpeaker));
 			Assert.AreEqual(HI_STRING, module!.Get<ISpeaker>()!.SayHi());
 		}
@@ -50,7 +50,7 @@ namespace Tests
 			Module module = new Module();
 			Assert.ThrowsException<KeyNotFoundException>(module.Get<Speaker>);
 
-			module.Add<Speaker>();
+			module.InstantiateValue<Speaker>();
 			Assert.AreEqual(HI_STRING, module!.Get<Speaker>()!.SayHi());
 			Assert.IsInstanceOfType(module.Get<Speaker>(), typeof(Speaker));
 		}
@@ -62,7 +62,7 @@ namespace Tests
 			Module module = new Module();
 			Assert.ThrowsException<KeyNotFoundException>(module.Get<ISpeaker>);
 
-			module.Add<ISpeaker, Speaker>();
+			module.InstantiateValue<ISpeaker, Speaker>();
 			Assert.AreEqual(HI_STRING, module!.Get<ISpeaker>()!.SayHi());
 			Assert.IsInstanceOfType(module.Get<ISpeaker>(), typeof(ISpeaker));
 		}
@@ -74,7 +74,7 @@ namespace Tests
 			Module module = new Module();
 			Assert.ThrowsException<KeyNotFoundException>(module.Get<ISpeaker>);
 
-			module.AddForExport<ISpeaker, Speaker>();
+			module.InstantiateValueForExport<ISpeaker, Speaker>();
 			Assert.AreEqual(HI_STRING, module!.Get<ISpeaker>()!.SayHi());
 			Assert.IsInstanceOfType(module.Get<ISpeaker>(), typeof(ISpeaker));
 		}
@@ -84,13 +84,13 @@ namespace Tests
 		public void InstantiatinghapensOnlyOnce()
 		{
 			Module module1 = new Module();
-			module1.Add<Speaker>();
+			module1.InstantiateValue<Speaker>();
 			var speaker11 = module1!.Get<Speaker>();
 			var speaker12 = module1!.Get<Speaker>();
 			Assert.AreEqual<Speaker>(speaker11, speaker12);
 
 			Module module2 = new Module();
-			module2.AddForExport<Speaker>();
+			module2.InstantiateValueForExport<Speaker>();
 			var speaker21 = module2!.Get<Speaker>();
 			var speaker22 = module2!.Get<Speaker>();
 			Assert.AreEqual<Speaker>(speaker21, speaker22);
@@ -103,11 +103,11 @@ namespace Tests
 		public void DoesntAllowYouToInstantiateOfAbstractTypes()
 		{
 			Module module = new Module();
-			Assert.ThrowsException<ArgumentException>(module.Add<ISpeaker>);
-			Assert.ThrowsException<ArgumentException>(module.Add<AbstractSpeaker>);
-			Assert.ThrowsException<ArgumentException>(module.Add<ISpeaker, ISpeaker>);
-			Assert.ThrowsException<ArgumentException>(module.Add<ISpeaker, AbstractSpeaker>);
-			Assert.ThrowsException<ArgumentException>(module.Add<AbstractSpeaker, AbstractSpeaker>);
+			Assert.ThrowsException<ArgumentException>(() => module.InstantiateValue<ISpeaker>());
+			Assert.ThrowsException<ArgumentException>(() => module.InstantiateValue<AbstractSpeaker>());
+			Assert.ThrowsException<ArgumentException>(() => module.InstantiateValue<ISpeaker, ISpeaker>());
+			Assert.ThrowsException<ArgumentException>(() => module.InstantiateValue<ISpeaker, AbstractSpeaker>());
+			Assert.ThrowsException<ArgumentException>(() => module.InstantiateValue<AbstractSpeaker, AbstractSpeaker>());
 		}
 
 
@@ -115,7 +115,7 @@ namespace Tests
 		public void AllowYouToInstantiateValueTypes()
 		{
 			Module module = new Module();
-			module.Add<ISpeaker, StructSpeaker>();
+			module.InstantiateValue<ISpeaker, StructSpeaker>();
 			ISpeaker speaker = module.Get<ISpeaker>();
 			Assert.IsInstanceOfType(speaker, typeof(StructSpeaker));
 			Assert.AreEqual(HI_STRING, speaker!.SayHi());

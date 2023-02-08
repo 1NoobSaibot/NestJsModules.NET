@@ -9,10 +9,10 @@ namespace Tests
 		public void ShouldProvideAValueToPropWithInjectAttribute()
 		{
 			Module module = new Module();
-			module.Add(PRIVATE_READONLY_KEY, PRIVATE_READONLY_VALUE);
-			module.Add(PRIVATE_PROP_KEY, PRIVATE_PROP_VALUE);
-			module.Add(CONSTRUCT_ARG_KEY,CONSTRUCT_ARG_VALUE);
-			module.Add<ISpeaker, Speaker>();
+			module.BindValue(PRIVATE_READONLY_KEY, PRIVATE_READONLY_VALUE);
+			module.BindValue(PRIVATE_PROP_KEY, PRIVATE_PROP_VALUE);
+			module.BindValue(CONSTRUCT_ARG_KEY,CONSTRUCT_ARG_VALUE);
+			module.InstantiateValue<ISpeaker, Speaker>();
 
 			var speaker = module.Get<ISpeaker>();
 			Assert.AreEqual(PRIVATE_READONLY_VALUE, speaker!.SayHi());
@@ -75,9 +75,9 @@ namespace Tests
 			const string MESSAGE = "Rock the microphone!!!";
 
 			var module = new Module();
-			module.Add<Root>();
-			module.Add<Child>();
-			module.Add<string>(MESSAGE);
+			module.InstantiateValue<Root>();
+			module.InstantiateValue<Child>();
+			module.BindValue<string>(MESSAGE);
 
 			var rootInstance = module.Get<Root>();
 			Assert.AreEqual(MESSAGE, rootInstance.Child.Message);

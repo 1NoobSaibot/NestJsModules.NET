@@ -9,7 +9,7 @@ namespace Tests
 		public void ShouldGetDependencyFromSubmoduleExports()
 		{
 			var submodule = new Module();
-			submodule.AddForExport<ISpeaker>(new Speaker());
+			submodule.BindValueForExport<ISpeaker>(new Speaker());
 
 			var rootmodule = new Module();
 			rootmodule.Import(submodule);
@@ -24,7 +24,7 @@ namespace Tests
 		public void ShouldNotGetDependencyFromChildrenInternalScopes()
 		{
 			var submodule = new Module();
-			submodule.Add<ISpeaker>(new Speaker());
+			submodule.BindValue<ISpeaker>(new Speaker());
 
 			var rootmodule = new Module();
 			rootmodule.Import(submodule);
@@ -37,7 +37,7 @@ namespace Tests
 		public void ShouldNotGetExportsOfStepChildren()
 		{
 			var stepson = new Module();
-			stepson.AddForExport<Speaker>();
+			stepson.InstantiateValueForExport<Speaker>();
 
 			var son = new Module();
 			son.Import(stepson);
