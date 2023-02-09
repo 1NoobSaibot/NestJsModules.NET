@@ -118,7 +118,7 @@ namespace NestJsModules
 			{
 				if (attr is Inject injectData)
 				{
-					string key = injectData.Key ?? param.GetType().ToString();
+					string key = injectData.Key ?? param.ParameterType.ToString();
 					return _module.Get(key);
 				}
 			}
