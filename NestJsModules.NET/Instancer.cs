@@ -123,7 +123,7 @@ namespace NestJsModules
 				}
 			}
 
-			return _module.Get(param.GetType().ToString());
+			return _module.Get(param.ParameterType.ToString());
 		}
 	}
 }
